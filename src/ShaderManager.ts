@@ -1,5 +1,7 @@
 import {Shader} from "./core/Shader.js";
 import {File} from "./core/File.js";
+import { MouseManager } from "./core/MouseManager.js";
+import { Timer } from "./core/Timer.js";
 
 const SHADER_VERT_SRC = "shaders/shader.vert";
 const SHADER_FRAG_SRC = "shaders/shader.frag";
@@ -21,10 +23,23 @@ export class ShaderManager{
     private fragmentCache: string | undefined;
     private vertexCache: string | undefined;
 
-    constructor(canvas: HTMLCanvasElement){
+    private readonly resX: number;
+    private readonly resY: number;
+
+    private readonly mouseManager: MouseManager;
+    private readonly timer: Timer;
+
+    constructor(canvas: HTMLCanvasElement, resX: number, resY: number){
 
         this.gl = canvas.getContext("webgl") as WebGLRenderingContext;
+        this.resX = resX;
+        this.resY = resY;
 
+        canvas.width = resX;
+        canvas.height = resY
+
+        this.mouseManager = new MouseManager(canvas);
+        this.timer = new Timer();
     }
 
     private async loadShaderData(): Promise<void>{
@@ -74,16 +89,28 @@ export class ShaderManager{
 
     public renderShaders(): void{
 
-        this.gl.viewport(0, 0, 500, 500);
+        this.gl.viewport(0, 0, this.resX, this.resY);
 
-        const iResolutionLoc = this.gl.getUniformLocation(this.GLSLProgram!, "iResolution");
+        const uResolution = this.gl.getUniformLocation(this.GLSLProgram!, "uResolution");
         this.gl.uniform2f(
-            iResolutionLoc,
-            500,
-            500
+            uResolution,
+            this.resX,
+            this.resY
+        );
+
+        const uMouse = this.gl.getUniformLocation(this.GLSLProgram!, "uMouse");
+        this.gl.uniform2f(
+            uMouse,
+            this.mouseManager.getMouseX(),
+            this.mouseManager.getMouseY()
+        );
+        const uTime = this.gl.getUniformLocation(this.GLSLProgram!, "uTime");
+        const time = this.timer.getTime();
+        this.gl.uniform1f(
+            uTime,
+            time
         );
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, vertices.length);
-
     }
 }  

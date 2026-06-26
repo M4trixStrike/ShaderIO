@@ -2,10 +2,13 @@ import { ShaderManager } from "./ShaderManager.js";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
-canvas.height = 500;
-canvas.width = 500;
-
-const sm = new ShaderManager(canvas);
+const sm = new ShaderManager(canvas, 500, 500);
 
 await sm.compileShaders();
-sm.renderShaders();
+
+function renderLoop(){
+    sm.renderShaders();
+    window.requestAnimationFrame(renderLoop);
+}
+
+renderLoop();

@@ -1,5 +1,7 @@
 import { Shader } from "./core/Shader.js";
 import { File } from "./core/File.js";
+import { MouseManager } from "./core/MouseManager.js";
+import { Timer } from "./core/Timer.js";
 const SHADER_VERT_SRC = "shaders/shader.vert";
 const SHADER_FRAG_SRC = "shaders/shader.frag";
 const vertices = new Float32Array([
@@ -15,8 +17,18 @@ export class ShaderManager {
     GLSLProgram;
     fragmentCache;
     vertexCache;
-    constructor(canvas) {
+    resX;
+    resY;
+    mouseManager;
+    timer;
+    constructor(canvas, resX, resY) {
         this.gl = canvas.getContext("webgl");
+        this.resX = resX;
+        this.resY = resY;
+        canvas.width = resX;
+        canvas.height = resY;
+        this.mouseManager = new MouseManager(canvas);
+        this.timer = new Timer();
     }
     async loadShaderData() {
         if (this.vertexCache == undefined) {
@@ -47,9 +59,14 @@ export class ShaderManager {
         this.gl.useProgram(this.GLSLProgram);
     }
     renderShaders() {
-        this.gl.viewport(0, 0, 500, 500);
-        const iResolutionLoc = this.gl.getUniformLocation(this.GLSLProgram, "iResolution");
-        this.gl.uniform2f(iResolutionLoc, 500, 500);
+        this.gl.viewport(0, 0, this.resX, this.resY);
+        const uResolution = this.gl.getUniformLocation(this.GLSLProgram, "uResolution");
+        this.gl.uniform2f(uResolution, this.resX, this.resY);
+        const uMouse = this.gl.getUniformLocation(this.GLSLProgram, "uMouse");
+        this.gl.uniform2f(uMouse, this.mouseManager.getMouseX(), this.mouseManager.getMouseY());
+        const uTime = this.gl.getUniformLocation(this.GLSLProgram, "uTime");
+        const time = this.timer.getTime();
+        this.gl.uniform1f(uTime, time);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, vertices.length);
     }
 }
