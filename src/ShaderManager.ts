@@ -15,6 +15,21 @@ const vertices = new Float32Array([
     1,  1
 ]);
 
+export enum UniformType{
+
+    FLOAT,
+    VECTOR_FLOAT_2,
+    VECTOR_FLOAT_3,
+    VECTOR_FLOAT_4,
+    INT,
+    VECTOR_INT_2,
+    VECTOR_INT_3,
+    VECTOR_INT_4,
+    MATRIX_2,
+    MATRIX_3,
+    MATRIX_4
+}
+
 export class ShaderManager{
 
     private readonly gl: WebGLRenderingContext;
@@ -58,6 +73,8 @@ export class ShaderManager{
 
     public async compileShaders(): Promise<void>{
 
+        const t1 = Date.now();
+
         await this.loadShaderData();
 
         if(!this.gl)
@@ -85,6 +102,8 @@ export class ShaderManager{
         this.gl.vertexAttribPointer(aPosition, 2, this.gl.FLOAT, false, 0, 0);
 
         this.gl.useProgram(this.GLSLProgram);
+
+        console.info(`Shader compiled in ${Date.now()-t1}ms.`)
     }
 
     public renderShaders(): void{
@@ -112,5 +131,66 @@ export class ShaderManager{
         );
 
         this.gl.drawArrays(this.gl.TRIANGLES, 0, vertices.length);
+    }
+
+    // Uniform injectors
+    public addUniform(uType: UniformType, uName: string, uVector: number[]){
+
+        const uLoc = this.gl.getUniformLocation(this.GLSLProgram!, uName);
+        
+        switch(uType){
+
+            case UniformType.FLOAT:
+                this.gl.uniform1fv(uLoc,uVector);
+                break;
+            case UniformType.VECTOR_FLOAT_2:
+                this.gl.uniform2fv(uLoc,uVector);
+                break;
+            case UniformType.VECTOR_FLOAT_3:
+                this.gl.uniform3fv(uLoc,uVector);
+                break;
+            case UniformType.VECTOR_FLOAT_4:
+                this.gl.uniform4fv(uLoc,uVector);
+                break;
+
+            case UniformType.INT:
+                this.gl.uniform1iv(uLoc,uVector);
+                break;
+            case UniformType.VECTOR_INT_2:
+                this.gl.uniform2iv(uLoc,uVector);
+                break;
+            case UniformType.VECTOR_INT_3:
+                this.gl.uniform3iv(uLoc,uVector);
+                break;
+            case UniformType.VECTOR_INT_4:
+                this.gl.uniform4iv(uLoc,uVector);
+                break;
+            default:
+                throw new Error(`Uniform [${uType}] is not supported nor recognized by this function!`);
+
+        }
+
+    }
+
+    public addUniformMatrix(uType: UniformType, uName: string, uVector: number[], mTranspose: boolean){
+
+        const uLoc = this.gl.getUniformLocation(this.GLSLProgram!, uName);
+
+        switch(uType){
+
+            case UniformType.MATRIX_2:
+                this.gl.uniformMatrix2fv(uLoc,mTranspose,uVector);
+                break;
+            case UniformType.MATRIX_3:
+                this.gl.uniformMatrix3fv(uLoc,mTranspose,uVector);
+                break;
+            case UniformType.MATRIX_4:
+                this.gl.uniformMatrix4fv(uLoc,mTranspose,uVector);
+                break;
+            default:
+                throw new Error(`Uniform [${uType}] is not supported nor recognized by this function!`);
+
+        }
+
     }
 }  
