@@ -12,10 +12,12 @@ export class MouseManager{
 
         this.canvsas = canvas;
 
-        this.canvsas.addEventListener("mousemove", (eData) => {
+        const boundingClient = canvas.getBoundingClientRect();
 
-            this.mouseX = eData.clientX / this.canvsas.width;
-            this.mouseY = 1 - eData.clientY / this.canvsas.height;
+         this.canvsas.addEventListener("mousemove", (eData) => {
+
+            this.mouseX = (eData.clientX - boundingClient.left) / this.canvsas.width;
+            this.mouseY = 1 - (eData.clientY - boundingClient.top) / this.canvsas.height;
 
         })
 
