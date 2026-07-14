@@ -1,9 +1,9 @@
 # ShaderIO #
 ShaderIO is a simple fragment shader engine built in TypeScript designed for rapid compilation, rendering, and modification of GLSL fragment shaders.
 
-## The `ShaderManager` class 
+## The `ShaderProgram` class 
 
-`ShaderManager` class is the core of the engine, providing methods that allow for fast development of projects relying on fragment shaders.
+`ShaderProgram` class is the core of the engine, providing methods that allow for fast development of projects relying on fragment shaders.
 
 ## Methods provided by the engine:
 - `compileShader()` \
@@ -15,6 +15,13 @@ Renders the current shader onto the targeted HTML canvas element.
 - `addUniform(uType, uName, uVector)` & `addUniformMatrix(uType, uName, uVector)` \
 Allows for fast and easy uniform injection into the loaded shader.
 
+- `getRuntime()` \
+Returns the shader's runtime in seconds.
+
+- `addAddon(addon)` \
+Attaches a custom addon to the engine. These addons are automatically injected during the shader compilation.
+
+
 ## Engine provided uniforms
 The engine comes with in-built uniforms that are automatically injected into the shader:
 
@@ -23,6 +30,23 @@ The engine comes with in-built uniforms that are automatically injected into the
 | `uTime`  | `float` | The elapsed engine runtime in seconds
 | `uResolution` | `vec2` | Current width and height of the targeted HTML canvas element
 | `uMouse`    | `vec2` | Mouse position over the targeted HTML canvas element normalized to values between `0.0` and `1.0`
+
+## Addons
+
+Addons must be registered using `addAddon()` before calling `compileShader()`, as they hook directly into the compilation.
+
+1. `OESFPTextures` \
+A utility addon that enables the WebGL floating-point texture extension.
+
+2. `FloatingPointTexture(bufferSize, textureWidth, textureHeight)` \
+This addon injects a custom floating point sampler2D `uFloatTexture` into the shader.\
+**Available Methods:**
+    - `clearBuffer()` \
+    Clears the internal data buffer
+    - `setPixel(x, y, rgba)` \
+    Sets the RGBA values of an individual pixel at the specified coordinate.
+    - `loadTexture()` \
+    Uploads the buffer data to the shader.
 
 ## How to run
 

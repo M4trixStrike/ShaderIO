@@ -1,7 +1,7 @@
-import { ShaderManager, UniformType } from "./ShaderManager.js";
+import { ShaderProgram } from "./ShaderProgram.js";
 const canvas = document.getElementById("canvas");
-const sm = new ShaderManager(canvas, 500, 500);
-await sm.compileShaders();
+const sm = new ShaderProgram(canvas, 500, 500);
+await sm.compileShader();
 function renderLoop() {
     sm.renderShader();
     window.requestAnimationFrame(renderLoop);

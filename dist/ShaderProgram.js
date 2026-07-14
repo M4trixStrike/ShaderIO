@@ -1,8 +1,8 @@
 import { Shader } from "./core/Shader.js";
 import { File } from "./core/File.js";
-import { MouseManager } from "./core/MouseManager.js";
+import { MouseManager } from "./core/managers/MouseManager.js";
 import { Timer } from "./core/Timer.js";
-import { UniformManager, UniformType } from "./UniformManager.js";
+import { UniformManager, UniformType } from "./core/managers/UniformManager.js";
 const SHADER_VERT_SRC = "shaders/shader.vert";
 const SHADER_FRAG_SRC = "shaders/shader.frag";
 const vertices = new Float32Array([
@@ -13,7 +13,7 @@ const vertices = new Float32Array([
     1, -1,
     1, 1
 ]);
-export class ShaderManager {
+export class ShaderProgram {
     _gl;
     _GLSLProgram;
     fragmentCache;
@@ -23,6 +23,7 @@ export class ShaderManager {
     mouseManager;
     timer;
     uniformManager;
+    activeAddons = [];
     constructor(canvas, resX, resY) {
         this._gl = canvas.getContext("webgl");
         this.resX = resX;
@@ -50,7 +51,7 @@ export class ShaderManager {
             throw new Error("WebGl program has failed to compile!");
         return this._GLSLProgram;
     }
-    async compileShaders() {
+    async compileShader() {
         const t1 = Date.now();
         await this.loadShaderData();
         if (this.vertexCache == undefined || this.fragmentCache == undefined)
@@ -70,6 +71,7 @@ export class ShaderManager {
         this.gl.useProgram(this.GLSLProgram);
         console.info(`Shader compiled in ${Date.now() - t1}ms.`);
         this.uniformManager = new UniformManager(this.gl, this.GLSLProgram);
+        this.activeAddons.forEach(activeAddon => activeAddon.inject(this.gl, this.GLSLProgram));
     }
     renderShader() {
         this.gl.viewport(0, 0, this.resX, this.resY);
@@ -88,7 +90,9 @@ export class ShaderManager {
         ]);
         this.gl.drawArrays(this.gl.TRIANGLES, 0, vertices.length / 2);
     }
-    // Utility
+    addAddon(addon) {
+        this.activeAddons.push(addon);
+    }
     getRuntime() {
         return this.timer.getTime();
     }
