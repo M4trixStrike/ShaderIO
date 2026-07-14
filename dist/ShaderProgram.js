@@ -96,4 +96,10 @@ export class ShaderProgram {
     getRuntime() {
         return this.timer.getTime();
     }
+    addUniform(uType, uName, uVector) {
+        this.uniformManager?.addUniform(uType, uName, uVector);
+    }
+    addUniformMatrix(uType, uName, uVector, mTranspose) {
+        this.uniformManager?.addUniformMatrix(uType, uName, uVector, mTranspose);
+    }
 }

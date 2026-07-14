@@ -161,4 +161,17 @@ export class ShaderProgram{
         return this.timer.getTime();
 
     }
+
+    public addUniform(uType: UniformType, uName: string, uVector: number[]): void{
+        
+        this.uniformManager?.addUniform(uType,uName,uVector);
+
+    }
+
+    public addUniformMatrix(uType: UniformType, uName: string, uVector: number[], mTranspose: boolean): void{
+        
+        this.uniformManager?.addUniformMatrix(uType,uName,uVector,mTranspose);
+
+    }
+    
 }  

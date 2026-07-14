@@ -12,7 +12,7 @@ Compiles the current shader provided in the `shaders/shader.frag` file and notif
 - `renderShader()` \
 Renders the current shader onto the targeted HTML canvas element.
 
-- `addUniform(uType, uName, uVector)` & `addUniformMatrix(uType, uName, uVector)` \
+- `addUniform(uType, uName, uVector)` & `addUniformMatrix(uType, uName, uVector, mTranspose)` \
 Allows for fast and easy uniform injection into the loaded shader.
 
 - `getRuntime()` \
