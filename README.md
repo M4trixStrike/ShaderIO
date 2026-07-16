@@ -12,7 +12,7 @@ Compiles the current shader provided in the `shaders/shader.frag` file and notif
 - `renderShader()` \
 Renders the current shader onto the targeted HTML canvas element.
 
-- `addUniform(uType, uName, uVector)` & `addUniformMatrix(uType, uName, uVector, mTranspose)` \
+- `setUniform(uType, uName, uVector)` & `setUniformMatrix(uType, uName, uVector, mTranspose)` \
 Allows for fast and easy uniform injection into the loaded shader.
 
 - `getRuntime()` \
@@ -35,7 +35,7 @@ The engine comes with in-built uniforms that are automatically injected into the
 
 Addons must be registered using `addAddon()` before calling `compileShader()`, as they hook directly into the compilation.
 
-1. `OESFPTextures` \
+1. `OESFPTextures()` \
 A utility addon that enables the WebGL floating-point texture extension.
 
 2. `FloatingPointTexture(bufferSize, textureWidth, textureHeight)` \
