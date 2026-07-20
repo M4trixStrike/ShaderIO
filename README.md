@@ -38,15 +38,25 @@ Addons must be registered using `addAddon()` before calling `compileShader()`, a
 1. `OESFPTextures()` \
 A utility addon that enables the WebGL floating-point texture extension.
 
-2. `FloatingPointTexture(bufferSize, textureWidth, textureHeight)` \
-This addon injects a custom floating point sampler2D `uFloatTexture` into the shader.\
-**Available Methods:**
-    - `clearBuffer()` \
-    Clears the internal data buffer
-    - `setPixel(x, y, rgba)` \
-    Sets the RGBA values of an individual pixel at the specified coordinate.
-    - `loadTexture()` \
-    Uploads the buffer data to the shader.
+2. `FloatingPointTexture(uniformName, bufferSize, textureWidth, textureHeight)` & `UnsignedIntTexture(uniformName, bufferSize, textureWidth, textureHeight)` \
+Those addons inject a custom 4 channel sampler2D uniform into the shader.
+    - **Parameters:**
+        - `uniformName` \
+        The name given to the uniform within GLSL shader code.
+        - `bufferSize` \
+        Size of the internal texture data buffer in bytes.
+        - `textureWidth` \
+        Width of the texture in pixels.
+        - `textureHeight` \
+        Height of the texture in pixels.
+    - **Available Methods:**
+        - `clearBuffer()` \
+        Clears the internal data buffer.
+        - `setPixel(x, y, rgba)` \
+        Sets the RGBA values of an individual pixel at the specified coordinate.
+        - `updateTexture()` \
+        Uploads the buffer data to the shader.
+
 
 ## How to run
 

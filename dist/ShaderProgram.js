@@ -55,7 +55,7 @@ export class ShaderProgram {
         const t1 = Date.now();
         await this.loadShaderData();
         if (this.vertexCache == undefined || this.fragmentCache == undefined)
-            throw new Error("Load shader data before compiling the shaders!");
+            throw new Error("Shader data failed to load.");
         const vertexShader = new Shader(this.gl.VERTEX_SHADER, this.vertexCache, this.gl);
         const fragShader = new Shader(this.gl.FRAGMENT_SHADER, this.fragmentCache, this.gl);
         this._GLSLProgram = this.gl.createProgram();

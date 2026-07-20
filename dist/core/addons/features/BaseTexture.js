@@ -1,22 +1,32 @@
-export class FloatTexture {
-    name = "uFloatTexture";
+export class BaseTexture {
     _texture;
     _gl;
     _dataBuffer;
     textureWidth;
     textureHeight;
     bufferSize;
-    constructor(bufferSize, textureWidth, textureHeight) {
-        this._dataBuffer = new Float32Array(bufferSize);
+    static textureSlot = 0;
+    chosenTextureSlot;
+    name;
+    arrayConstructor;
+    bufferDataType;
+    constructor(uniformName, bufferSize, textureWidth, textureHeight, arrayConstructor, bufferDataType) {
+        this.name = uniformName;
         this.bufferSize = bufferSize;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
+        this.arrayConstructor = arrayConstructor;
+        this.bufferDataType = bufferDataType;
+        this._dataBuffer = new this.arrayConstructor(bufferSize);
+        this.chosenTextureSlot = BaseTexture.textureSlot++;
+        if (this.chosenTextureSlot > 30)
+            throw new Error(`Texture unit slot out of range: [${this.chosenTextureSlot}/30]`);
     }
     get dataBuffer() {
         if (this._dataBuffer == undefined)
-            throw new Error("Float-point texture data buffer is undefined!");
+            throw new Error("Texture data buffer is undefined!");
         if (this._dataBuffer.length == 0)
-            throw new Error("Float-point texture data buffer is empty!");
+            throw new Error("Texture data buffer is empty!");
         return this._dataBuffer;
     }
     get gl() {
@@ -34,18 +44,18 @@ export class FloatTexture {
     inject(gl2, program) {
         this._gl = gl2;
         this._texture = this.gl.createTexture();
-        this.gl.activeTexture(this.gl.TEXTURE0);
+        const texture = this.gl.getUniformLocation(program, this.name);
+        this.gl.uniform1i(texture, this.chosenTextureSlot);
+        console.info(`[${this.name}] sampler2D 4 channel uniform on texture slot [${this.chosenTextureSlot}] has been added!`);
+    }
+    updateTexture() {
+        this.gl.activeTexture(this.gl.TEXTURE0 + this.chosenTextureSlot);
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
-        const floatTexture = this.gl.getUniformLocation(program, this.name);
-        this.gl.uniform1i(floatTexture, 0);
-        console.info(`[${this.name}] sampler2D uniform has been added!`);
-    }
-    loadTexture() {
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.textureWidth, this.textureHeight, 0, this.gl.RGBA, this.gl.FLOAT, this.dataBuffer);
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.textureWidth, this.textureHeight, 0, this.gl.RGBA, this.bufferDataType, this.dataBuffer);
     }
     setPixel(x, y, rgba = [0., 0., 0., 0.]) {
         this.dataBuffer[(x + y * this.textureWidth) * 4] = rgba[0];
@@ -54,6 +64,6 @@ export class FloatTexture {
         this.dataBuffer[(x + y * this.textureWidth) * 4 + 3] = rgba[3];
     }
     clearBuffer() {
-        this._dataBuffer = new Float32Array(this.bufferSize);
+        this._dataBuffer = new this.arrayConstructor(this.bufferSize);
     }
 }

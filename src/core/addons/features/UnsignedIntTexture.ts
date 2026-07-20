@@ -1,6 +1,6 @@
 import { BaseTexture } from "./BaseTexture.js";
 
-export class FloatingPointTexture extends BaseTexture<Float32Array>{
+export class UnsignedIntTexture extends BaseTexture<Uint8Array>{
 
     constructor(
         uniformName: string, 
@@ -8,7 +8,7 @@ export class FloatingPointTexture extends BaseTexture<Float32Array>{
         textureWidth: number, 
         textureHeight: number
     ){
-        super(uniformName,bufferSize,textureWidth,textureHeight,Float32Array,5126);
+        super(uniformName,bufferSize,textureWidth,textureHeight,Uint8Array,5121);
     }
 
 }

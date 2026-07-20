@@ -84,7 +84,7 @@ export class ShaderProgram{
         await this.loadShaderData();
 
         if(this.vertexCache == undefined || this.fragmentCache == undefined)
-            throw new Error("Load shader data before compiling the shaders!")
+            throw new Error("Shader data failed to load.")
         
         const vertexShader: Shader = new Shader(this.gl.VERTEX_SHADER,this.vertexCache,this.gl);
         const fragShader: Shader = new Shader(this.gl.FRAGMENT_SHADER,this.fragmentCache,this.gl);
@@ -110,7 +110,7 @@ export class ShaderProgram{
 
         this.uniformManager = new UniformManager(this.gl,this.GLSLProgram);
 
-        this.activeAddons.forEach( activeAddon => activeAddon.inject(this.gl,this.GLSLProgram))
+        this.activeAddons.forEach( activeAddon => activeAddon.inject(this.gl,this.GLSLProgram));
         
     }
 
