@@ -21,6 +21,16 @@ Returns the shader's runtime in seconds.
 - `addAddon(addon)` \
 Attaches a custom addon to the engine. These addons are automatically injected during the shader compilation.
 
+- `setShaderString(shaderString)` \
+Sets a custom GLSL code string directly as the active shader source.
+
+- `setShaderFileSource(source)` \
+Sets a custom file path from which the engine will load the shader. Default file path is `shaders/shader.frag`
+
+## Engine properties:
+
+- `shaderSource` \
+An enum value that determines whether the engine reads shader code from an external file or a raw string.
 
 ## Engine provided uniforms
 The engine comes with in-built uniforms that are automatically injected into the shader:

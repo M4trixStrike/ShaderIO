@@ -5,8 +5,13 @@ import { Timer } from "./core/Timer.js";
 import { UniformManager, UniformType } from "./core/managers/UniformManager.js";
 import type { IShaderAddon } from "./core/addons/IShaderAddon.js";
 
-const SHADER_VERT_SRC = "shaders/shader.vert";
-const SHADER_FRAG_SRC = "shaders/shader.frag";
+const VERTEX_SHADER = `
+attribute vec2 aPosition;
+
+void main() {
+    gl_Position = vec4(aPosition, 0.0, 1.0);
+}
+`
 
 const vertices = new Float32Array([
     -1, -1,
@@ -17,13 +22,19 @@ const vertices = new Float32Array([
     1,  1
 ]);
 
+export enum ShaderSource{
+
+    FilePath,
+    RawString
+
+}
+
 export class ShaderProgram{
 
     private readonly _gl: WebGLRenderingContext | null;
     private _GLSLProgram: WebGLProgram | undefined;
 
-    private fragmentCache: string | undefined;
-    private vertexCache: string | undefined;
+    private fragmentCache: string = "";
 
     private readonly resX: number;
     private readonly resY: number;
@@ -32,7 +43,11 @@ export class ShaderProgram{
     private readonly timer: Timer;
     private uniformManager: UniformManager | undefined;
 
+    private shaderFileSrc: string = "shaders/shader.frag";
+
     private activeAddons: IShaderAddon[] = [];
+
+    public shaderSource: ShaderSource = ShaderSource.FilePath;
 
     constructor(canvas: HTMLCanvasElement, resX: number, resY: number){
 
@@ -49,14 +64,10 @@ export class ShaderProgram{
 
     private async loadShaderData(): Promise<void>{
 
-        if(this.vertexCache == undefined){
+        if(this.shaderSource == ShaderSource.RawString) 
+            return;
 
-            const vertFileHandler = new File(SHADER_VERT_SRC);
-            this.vertexCache = await vertFileHandler.open();
-
-        }
-
-        const fragFileHandler = new File(SHADER_FRAG_SRC);
+        const fragFileHandler = new File(this.shaderFileSrc);
         this.fragmentCache = await fragFileHandler.open();
 
     }
@@ -77,16 +88,34 @@ export class ShaderProgram{
         
     }
 
+    public setShaderString(shaderSource: string): void{
+
+        if(this.shaderSource == ShaderSource.FilePath)
+            console.warn("Engine shader source is set to [File]! Change the shader source by modifying the .shaderSource class property.")
+
+        this.fragmentCache = shaderSource;
+
+    }
+
+    public setShaderFileSource(source: string){
+
+        this.shaderFileSrc = source;
+
+    }
+
     public async compileShader(): Promise<void>{
 
         const t1 = Date.now();
 
         await this.loadShaderData();
 
-        if(this.vertexCache == undefined || this.fragmentCache == undefined)
-            throw new Error("Shader data failed to load.")
+        if(this.shaderSource == ShaderSource.RawString && this.fragmentCache.length <= 0)
+            throw new Error("Fragment shader string cant be null or empty");
+
+        if(this.fragmentCache == undefined)
+            throw new Error("Shader data failed to load.");
         
-        const vertexShader: Shader = new Shader(this.gl.VERTEX_SHADER,this.vertexCache,this.gl);
+        const vertexShader: Shader = new Shader(this.gl.VERTEX_SHADER,VERTEX_SHADER,this.gl);
         const fragShader: Shader = new Shader(this.gl.FRAGMENT_SHADER,this.fragmentCache,this.gl);
 
         this._GLSLProgram = this.gl.createProgram();
