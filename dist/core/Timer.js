@@ -1,12 +1,12 @@
 export class Timer {
     initTime;
     constructor() {
-        this.initTime = Date.now();
+        this.initTime = performance.now();
     }
     getTime() {
-        return (Date.now() - this.initTime) / 1000;
+        return (performance.now() - this.initTime) / 1000;
     }
     resetTimer() {
-        this.initTime = Date.now();
+        this.initTime = performance.now();
     }
 }

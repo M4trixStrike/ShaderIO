@@ -10,14 +10,14 @@ export class BaseTexture {
     name;
     arrayConstructor;
     bufferDataType;
-    constructor(uniformName, bufferSize, textureWidth, textureHeight, arrayConstructor, bufferDataType) {
+    constructor(uniformName, textureWidth, textureHeight, arrayConstructor, bufferDataType) {
         this.name = uniformName;
-        this.bufferSize = bufferSize;
+        this.bufferSize = textureHeight * textureWidth * 4;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
         this.arrayConstructor = arrayConstructor;
         this.bufferDataType = bufferDataType;
-        this._dataBuffer = new this.arrayConstructor(bufferSize);
+        this._dataBuffer = new this.arrayConstructor(this.bufferSize);
         this.chosenTextureSlot = BaseTexture.textureSlot++;
         if (this.chosenTextureSlot > 30)
             throw new Error(`Texture unit slot out of range: [${this.chosenTextureSlot}/30]`);
@@ -47,6 +47,7 @@ export class BaseTexture {
         const texture = this.gl.getUniformLocation(program, this.name);
         this.gl.uniform1i(texture, this.chosenTextureSlot);
         console.info(`[${this.name}] sampler2D 4 channel uniform on texture slot [${this.chosenTextureSlot}] has been added!`);
+        this.updateTexture();
     }
     updateTexture() {
         this.gl.activeTexture(this.gl.TEXTURE0 + this.chosenTextureSlot);
@@ -58,12 +59,11 @@ export class BaseTexture {
         this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.textureWidth, this.textureHeight, 0, this.gl.RGBA, this.bufferDataType, this.dataBuffer);
     }
     setPixel(x, y, rgba = [0., 0., 0., 0.]) {
-        this.dataBuffer[(x + y * this.textureWidth) * 4] = rgba[0];
-        this.dataBuffer[(x + y * this.textureWidth) * 4 + 1] = rgba[1];
-        this.dataBuffer[(x + y * this.textureWidth) * 4 + 2] = rgba[2];
-        this.dataBuffer[(x + y * this.textureWidth) * 4 + 3] = rgba[3];
+        if (x >= this.textureWidth || x < 0 || y >= this.textureHeight || y < 0)
+            throw new Error(`Position [${x},${y}] is out of bounds of the texture!`);
+        this.dataBuffer.set(rgba, (x + y * this.textureWidth) * 4);
     }
     clearBuffer() {
-        this._dataBuffer = new this.arrayConstructor(this.bufferSize);
+        this.dataBuffer.fill(0);
     }
 }

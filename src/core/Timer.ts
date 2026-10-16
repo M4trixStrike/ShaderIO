@@ -5,19 +5,19 @@ export class Timer{
 
     constructor(){
 
-        this.initTime = Date.now();
+        this.initTime = performance.now();
 
     }
 
     getTime(): number{
 
-        return ( Date.now() - this.initTime ) / 1000;
+        return ( performance.now() - this.initTime ) / 1000;
 
     }
 
     resetTimer(): void{
 
-        this.initTime = Date.now();
+        this.initTime = performance.now();
 
     }
 

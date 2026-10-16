@@ -4,11 +4,10 @@ export class FloatingPointTexture extends BaseTexture<Float32Array>{
 
     constructor(
         uniformName: string, 
-        bufferSize: number, 
         textureWidth: number, 
         textureHeight: number
     ){
-        super(uniformName,bufferSize,textureWidth,textureHeight,Float32Array,5126);
+        super(uniformName,textureWidth,textureHeight,Float32Array,5126);
     }
 
 }

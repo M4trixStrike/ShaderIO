@@ -23,18 +23,18 @@ export class BaseTexture<T extends Float32Array | Uint8Array> implements IShader
     private readonly arrayConstructor: TypedArrayConstructor<T>;
     private readonly bufferDataType: number;
 
-    constructor(uniformName: string, bufferSize: number, textureWidth: number, textureHeight: number, arrayConstructor: TypedArrayConstructor<T>, bufferDataType: number){
+    constructor(uniformName: string, textureWidth: number, textureHeight: number, arrayConstructor: TypedArrayConstructor<T>, bufferDataType: number){
 
         this.name = uniformName;
 
-        this.bufferSize = bufferSize;
+        this.bufferSize = textureHeight * textureWidth * 4;
         this.textureWidth = textureWidth;
         this.textureHeight = textureHeight;
 
         this.arrayConstructor = arrayConstructor;
         this.bufferDataType = bufferDataType;
 
-        this._dataBuffer = new this.arrayConstructor(bufferSize);
+        this._dataBuffer = new this.arrayConstructor(this.bufferSize);
 
         this.chosenTextureSlot = BaseTexture.textureSlot++;
         if(this.chosenTextureSlot > 30)    
@@ -79,6 +79,8 @@ export class BaseTexture<T extends Float32Array | Uint8Array> implements IShader
 
         console.info(`[${this.name}] sampler2D 4 channel uniform on texture slot [${this.chosenTextureSlot}] has been added!`);
 
+        this.updateTexture();
+
     }
 
     public updateTexture(): void{
@@ -108,16 +110,16 @@ export class BaseTexture<T extends Float32Array | Uint8Array> implements IShader
 
     public setPixel(x: number, y: number, rgba: number[] = [0.,0.,0.,0.]){
 
-        this.dataBuffer[ ( x + y * this.textureWidth ) * 4] = rgba[0]!;
-        this.dataBuffer[ ( x + y * this.textureWidth ) * 4 + 1] = rgba[1]!;
-        this.dataBuffer[ ( x + y * this.textureWidth ) * 4 + 2] = rgba[2]!;
-        this.dataBuffer[ ( x + y * this.textureWidth ) * 4 + 3] = rgba[3]!;
+        if(x >= this.textureWidth || x < 0 || y >= this.textureHeight || y < 0)
+            throw new Error(`Position [${x},${y}] is out of bounds of the texture!`);
+
+        this.dataBuffer.set(rgba, ( x + y * this.textureWidth ) * 4);
 
     }
 
     public clearBuffer(): void{
 
-        this._dataBuffer = new this.arrayConstructor(this.bufferSize);
+        this.dataBuffer.fill(0)
 
     }
 

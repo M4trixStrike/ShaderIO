@@ -1,5 +1,5 @@
 import { Shader } from "./core/Shader.js";
-import { File } from "./core/File.js";
+import { File } from "./core/FileLoader.js";
 import { MouseManager } from "./core/managers/MouseManager.js";
 import { Timer } from "./core/Timer.js";
 import { UniformManager, UniformType } from "./core/managers/UniformManager.js";
@@ -18,7 +18,7 @@ const vertices = new Float32Array([
     1, -1,
     1, 1
 ]);
-export var ShaderSource;
+var ShaderSource;
 (function (ShaderSource) {
     ShaderSource[ShaderSource["FilePath"] = 0] = "FilePath";
     ShaderSource[ShaderSource["RawString"] = 1] = "RawString";
@@ -61,11 +61,11 @@ export class ShaderProgram {
         return this._GLSLProgram;
     }
     setShaderString(shaderSource) {
-        if (this.shaderSource == ShaderSource.FilePath)
-            console.warn("Engine shader source is set to [File]! Change the shader source by modifying the .shaderSource class property.");
+        this.shaderSource = ShaderSource.RawString;
         this.fragmentCache = shaderSource;
     }
     setShaderFileSource(source) {
+        this.shaderSource = ShaderSource.FilePath;
         this.shaderFileSrc = source;
     }
     async compileShader() {
@@ -78,6 +78,8 @@ export class ShaderProgram {
         const vertexShader = new Shader(this.gl.VERTEX_SHADER, VERTEX_SHADER, this.gl);
         const fragShader = new Shader(this.gl.FRAGMENT_SHADER, this.fragmentCache, this.gl);
         this._GLSLProgram = this.gl.createProgram();
+        if (this._GLSLProgram == null)
+            throw new Error("Failed to create the GLSL program!");
         this.gl.attachShader(this.GLSLProgram, vertexShader.getCompiledShader());
         this.gl.attachShader(this.GLSLProgram, fragShader.getCompiledShader());
         this.gl.linkProgram(this.GLSLProgram);

@@ -1,3 +1,5 @@
+import { OESFPTextures } from "./core/addons/extensions/OESFPTextures.js";
+import { FloatingPointTexture } from "./core/addons/features/FloatingPointTexture.js";
 import { ShaderProgram } from "./ShaderProgram.js";
 
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;

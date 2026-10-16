@@ -1,5 +1,5 @@
 import {Shader} from "./core/Shader.js";
-import {File} from "./core/File.js";
+import {File} from "./core/FileLoader.js";
 import { MouseManager } from "./core/managers/MouseManager.js";
 import { Timer } from "./core/Timer.js";
 import { UniformManager, UniformType } from "./core/managers/UniformManager.js";
@@ -22,7 +22,7 @@ const vertices = new Float32Array([
     1,  1
 ]);
 
-export enum ShaderSource{
+enum ShaderSource{
 
     FilePath,
     RawString
@@ -47,7 +47,7 @@ export class ShaderProgram{
 
     private activeAddons: IShaderAddon[] = [];
 
-    public shaderSource: ShaderSource = ShaderSource.FilePath;
+    private shaderSource: ShaderSource = ShaderSource.FilePath;
 
     constructor(canvas: HTMLCanvasElement, resX: number, resY: number){
 
@@ -90,15 +90,14 @@ export class ShaderProgram{
 
     public setShaderString(shaderSource: string): void{
 
-        if(this.shaderSource == ShaderSource.FilePath)
-            console.warn("Engine shader source is set to [File]! Change the shader source by modifying the .shaderSource class property.")
-
+        this.shaderSource = ShaderSource.RawString;
         this.fragmentCache = shaderSource;
 
     }
 
     public setShaderFileSource(source: string){
 
+        this.shaderSource = ShaderSource.FilePath;
         this.shaderFileSrc = source;
 
     }
@@ -119,6 +118,9 @@ export class ShaderProgram{
         const fragShader: Shader = new Shader(this.gl.FRAGMENT_SHADER,this.fragmentCache,this.gl);
 
         this._GLSLProgram = this.gl.createProgram();
+
+        if(this._GLSLProgram == null)
+            throw new Error("Failed to create the GLSL program!");
 
         this.gl.attachShader(this.GLSLProgram,vertexShader.getCompiledShader());
         this.gl.attachShader(this.GLSLProgram,fragShader.getCompiledShader());
@@ -208,5 +210,5 @@ export class ShaderProgram{
         this.uniformManager?.setUniformMatrix(uType,uName,uVector,mTranspose);
 
     }
-    
+
 }  
