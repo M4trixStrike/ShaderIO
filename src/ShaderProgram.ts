@@ -191,6 +191,12 @@ export class ShaderProgram{
 
     }
 
+    public resetRuntime(): void{
+
+        this.timer.resetTimer();
+
+    }
+
     public setUniform(uType: UniformType, uName: string, uVector: number[]): void{
         
         this.uniformManager?.setUniform(uType,uName,uVector);

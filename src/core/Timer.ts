@@ -9,9 +9,15 @@ export class Timer{
 
     }
 
-    getTime(){
+    getTime(): number{
 
         return ( Date.now() - this.initTime ) / 1000;
+
+    }
+
+    resetTimer(): void{
+
+        this.initTime = Date.now();
 
     }
 

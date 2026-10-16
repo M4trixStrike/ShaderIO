@@ -6,4 +6,7 @@ export class Timer {
     getTime() {
         return (Date.now() - this.initTime) / 1000;
     }
+    resetTimer() {
+        this.initTime = Date.now();
+    }
 }
